@@ -8,6 +8,14 @@ const form = document.getElementById('form');
 const resultsEl = document.getElementById('results');
 const chartEl = document.getElementById('chart');
 const errorEl = document.getElementById('error');
+const dateInput = form.date;
+
+// Open the native date picker on click/focus so the user doesn't have to use arrow keys.
+const openPicker = () => {
+  try { if (typeof dateInput.showPicker === 'function') dateInput.showPicker(); } catch (_) { /* ignore */ }
+};
+dateInput.addEventListener('click', openPicker);
+dateInput.addEventListener('focus', openPicker);
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();

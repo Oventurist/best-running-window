@@ -62,6 +62,12 @@ body {
 .disclaimer { margin-top: 16px; font-size: 0.85rem; color: #64748B; font-style: italic; }
 .chart-card svg { width: 100%; height: auto; display: block; }
 .chart-title { font-size: 1.1rem; font-weight: 600; margin: 0 0 12px; }
+.date-wrap { position: relative; cursor: pointer; }
+.date-wrap::after {
+  content: "📅"; position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  pointer-events: none; font-size: 1rem; opacity: 0.7;
+}
+.field input[type=date] { padding-right: 36px; cursor: pointer; width: 100%; }
 @media (max-width: 600px) {
   .app-shell { padding: 24px 14px; }
   .hero h1 { font-size: 1.5rem; }

@@ -20,7 +20,7 @@ describe('ui render', () => {
     });
     expect(el.innerHTML).toContain('02:30'); // 150 min
     expect(el.innerHTML).toContain('03:15'); // 195 min
-    expect(el.innerHTML).toContain('12.0°C'); // avg WBGT
+    expect(el.innerHTML).toContain('53.6°F'); // avg WBGT (12°C -> 53.6°F)
     expect(el.innerHTML).toContain('Open sun');
     expect(el.innerHTML).toMatch(/★|☆/); // star rank present
     expect(el.innerHTML).toContain('does not predict BPM'); // honest disclaimer
