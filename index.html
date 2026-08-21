@@ -15,7 +15,26 @@
       <h1>Find Your Best Running Window</h1>
       <p class="subtitle">The coolest, lowest-heat-stress minutes of your day — to the nearest minute.</p>
     </header>
-    <form id="form" class="card" aria-label="Run window inputs"></form>
+    <form id="form" class="card" aria-label="Run window inputs">
+      <div class="field">
+        <label for="zip">ZIP code</label>
+        <input id="zip" name="zip" type="text" inputmode="numeric" pattern="[0-9]{5}" placeholder="e.g. 10001" required />
+      </div>
+      <div class="field">
+        <label for="date">Date</label>
+        <input id="date" name="date" type="date" value="2026-08-21" required />
+      </div>
+      <div class="field">
+        <label for="runlen">Run length (minutes)</label>
+        <input id="runlen" name="runlen" type="number" min="1" max="600" value="45" required />
+      </div>
+      <div class="field field-inline">
+        <input id="shaded" name="shaded" type="checkbox" />
+        <label for="shaded">Shaded route (no direct sun)</label>
+      </div>
+      <button type="submit" class="cta">Find my best run window</button>
+      <p id="error" class="error" role="alert" hidden></p>
+    </form>
     <section id="results" class="results" aria-live="polite"></section>
     <section id="chart" class="chart-card" aria-label="24-hour weather timeline"></section>
   </main>
