@@ -41,8 +41,8 @@ describe('ui render', () => {
     const svg = el.querySelector('svg');
     expect(svg).not.toBeNull();
     expect(svg.getAttribute('aria-label')).toContain('highlighted');
-    // two boundary lines + one band rect = 3 amber elements
-    const amberEls = [...svg.querySelectorAll('[stroke="var(--color-accent)"], [fill="var(--color-accent)"]')];
+    // two boundary lines + one band rect = 3 mint elements
+    const amberEls = [...svg.querySelectorAll('[stroke="#2DD4BF"], [fill="#2DD4BF"]')];
     expect(amberEls.length).toBeGreaterThanOrEqual(3);
     expect(el.innerHTML).toContain('Testville');
   });
