@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Find Your Best Running Window | AERO RUN</title>
+<title>Best Running Window</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -108,23 +108,9 @@
 </script>
 <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="bg-surface text-on-surface min-h-screen font-body-md flex flex-col relative pb-24">
-<!-- TopAppBar -->
-<header class="bg-surface-glass backdrop-blur-md shadow-sm fixed top-0 w-full z-50 flex items-center justify-between px-margin-mobile md:px-margin-desktop h-16 transition-all duration-200 ease-in-out">
-  <div class="flex items-center gap-2">
-    <span class="material-symbols-outlined text-vibrant-mint" style="font-variation-settings: 'FILL' 1;">diamond</span>
-    <h1 class="font-headline-md text-headline-md tracking-tighter text-primary">AERO RUN</h1>
-  </div>
-  <nav class="hidden md:flex gap-6">
-    <a class="font-label-bold text-label-bold text-primary border-b-2 border-vibrant-mint pb-1" href="#">Forecast</a>
-    <a class="font-label-bold text-label-bold text-on-surface-variant hover:opacity-80 transition-opacity" href="#">Routes</a>
-    <a class="font-label-bold text-label-bold text-on-surface-variant hover:opacity-80 transition-opacity" href="#">Activity</a>
-  </nav>
-</header>
-
-<main class="flex-grow pt-16 md:pt-24 flex flex-col items-center">
-  <!-- Hero Section -->
-  <section class="w-full relative h-[55vh] min-h-[420px] flex items-end pb-stack-lg px-margin-mobile md:px-margin-desktop overflow-hidden">
+<body class="bg-surface text-on-surface min-h-screen font-body-md flex flex-col relative">
+<!-- Hero Section -->
+<section class="w-full relative h-[55vh] min-h-[420px] flex items-end pb-stack-lg px-margin-mobile md:px-margin-desktop overflow-hidden">
     <picture class="absolute inset-0 z-0">
       <source srcset="assets/banner.webp" type="image/webp">
       <img src="assets/banner.jpg" alt="Trail runner at sunrise in the alpine mountains" class="w-full h-full object-cover" style="object-position: center 35%;">
@@ -137,7 +123,7 @@
   </section>
 
   <!-- Form Card -->
-  <section class="w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop -mt-12 relative z-20 mb-stack-lg">
+  <section class="w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop relative z-20 mb-stack-lg mt-stack-lg">
     <div class="glass-card rounded-xl border border-cool-gray-100 p-margin-mobile md:p-stack-lg shadow-[0_20px_40px_-15px_rgba(2,6,23,0.1)]">
       <form id="form" class="space-y-stack-md">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
@@ -193,10 +179,10 @@
   </section>
 
   <!-- Results -->
-  <section id="results" class="results w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mb-stack-lg" aria-live="polite"></section>
+  <section id="results" class="results w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mb-stack-lg" aria-live="polite" hidden></section>
 
   <!-- Chart -->
-  <section id="chart" class="chart-card glass-card rounded-xl border border-cool-gray-100 p-margin-mobile md:p-stack-lg shadow-[0_20px_40px_-15px_rgba(2,6,23,0.1)] w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mb-stack-lg" aria-label="24-hour weather timeline"></section>
+  <section id="chart" class="chart-card glass-card rounded-xl border border-cool-gray-100 p-margin-mobile md:p-stack-lg shadow-[0_20px_40px_-15px_rgba(2,6,23,0.1)] w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mb-stack-lg" aria-label="24-hour weather timeline" hidden></section>
 </main>
 
 <script>

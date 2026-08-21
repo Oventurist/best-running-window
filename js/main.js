@@ -22,6 +22,8 @@ form.addEventListener('submit', async (e) => {
   errorEl.hidden = true;
   resultsEl.innerHTML = '';
   chartEl.innerHTML = '';
+  resultsEl.hidden = true;
+  chartEl.hidden = true;
   const zip = form.zipcode.value.trim();
   const runLengthMin = parseInt(form.duration.value, 10);
   const shaded = form.toggle.checked;
@@ -34,6 +36,8 @@ form.addEventListener('submit', async (e) => {
     const window = findBestWindow(wbgtPerMin, runLengthMin);
     renderResults(resultsEl, { window, wbgtPerMin, runLengthMin, shaded });
     renderTimeline(chartEl, { minute, wbgtPerMin, window, shaded, placeName: name });
+    resultsEl.hidden = false;
+    chartEl.hidden = false;
   } catch (err) {
     showError(errorEl, err.message || 'Something went wrong fetching weather.');
   }
