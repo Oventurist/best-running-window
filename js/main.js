@@ -17,9 +17,10 @@ form.addEventListener('submit', async (e) => {
   const zip = form.zip.value.trim();
   const runLengthMin = parseInt(form.runlen.value, 10);
   const shaded = form.shaded.checked;
+  const dateISO = form.date.value; // 'YYYY-MM-DD'
   try {
     const { lat, lon, name } = await geocodeZip(zip);
-    const raw = await fetchWeather(lat, lon);
+    const raw = await fetchWeather(lat, lon, dateISO);
     const minute = interpolateHourly(raw);
     const wbgtPerMin = computeWBGT(minute, { shaded });
     const window = findBestWindow(wbgtPerMin, runLengthMin);

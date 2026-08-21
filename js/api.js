@@ -1,14 +1,19 @@
 const GEO_URL = 'https://geocoding-api.open-meteo.com/v1/search';
 const FORECAST_URL = 'https://api.open-meteo.com/v1/forecast';
 
-export function buildForecastUrl(lat, lon) {
-  const p = new URLSearchParams({
+export function buildForecastUrl(lat, lon, dateISO) {
+  const params = {
     latitude: String(lat),
     longitude: String(lon),
     hourly: 'temperature_2m,relative_humidity_2m,wind_speed_10m,cloud_cover,shortwave_radiation',
     wind_speed_unit: 'ms',
     timezone: 'auto'
-  });
+  };
+  if (dateISO) {
+    params.start_date = dateISO;
+    params.end_date = dateISO;
+  }
+  const p = new URLSearchParams(params);
   return `${FORECAST_URL}?${p.toString()}`;
 }
 
@@ -24,11 +29,14 @@ export async function geocodeZip(zip) {
   return { lat: r.latitude, lon: r.longitude, name: r.name, country: r.country };
 }
 
-export async function fetchWeather(lat, lon) {
-  const res = await fetch(buildForecastUrl(lat, lon));
+export async function fetchWeather(lat, lon, dateISO) {
+  const res = await fetch(buildForecastUrl(lat, lon, dateISO));
   if (!res.ok) throw new Error(`Weather request failed: ${res.status}`);
   const data = await res.json();
   const h = data.hourly;
+  if (!h || !h.time || h.time.length === 0) {
+    throw new Error('No forecast data returned for that date.');
+  }
   return {
     time: h.time,
     temperature_2m: h.temperature_2m,

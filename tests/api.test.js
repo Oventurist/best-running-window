@@ -13,6 +13,12 @@ describe('api', () => {
     expect(url).toContain('wind_speed_unit=ms');
   });
 
+  it('adds start/end date when dateISO given', () => {
+    const url = buildForecastUrl(40.71, -74.0, '2026-08-21');
+    expect(url).toContain('start_date=2026-08-21');
+    expect(url).toContain('end_date=2026-08-21');
+  });
+
   it('geocodeZip parses json response', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
