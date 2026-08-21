@@ -2,11 +2,13 @@ export function renderTimeline(el, { minute, wbgtPerMin, window, shaded, placeNa
   const W = 800, H = 320, pad = 40;
   const n = wbgtPerMin.length;
   if (n === 0) { el.innerHTML = ''; return; }
+  const cToF = (c) => c * 9 / 5 + 32;
+  const tempsF = minute.temperature_2m.map(cToF);
   const x = (i) => pad + (i / (n - 1)) * (W - 2 * pad);
-  const tMin = Math.min(...minute.temperature_2m), tMax = Math.max(...minute.temperature_2m);
+  const tMin = Math.min(...tempsF), tMax = Math.max(...tempsF);
   const yT = (v) => H - pad - ((v - tMin) / (tMax - tMin || 1)) * (H - 2 * pad);
 
-  const tempPath = minute.temperature_2m.map((v, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${yT(v).toFixed(1)}`).join(' ');
+  const tempPath = tempsF.map((v, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${yT(v).toFixed(1)}`).join(' ');
   const xs = x(window.startMin), xe = x(window.endMin);
   const winLen = window.endMin - window.startMin;
 
@@ -22,7 +24,7 @@ export function renderTimeline(el, { minute, wbgtPerMin, window, shaded, placeNa
         const i = Math.min(n - 1, h * 60);
         return `<text x="${x(i).toFixed(1)}" y="${H - pad + 18}" font-size="11" fill="#64748B" text-anchor="middle">${String(h).padStart(2,'0')}:00</text>`;
       }).join('')}
-      <text x="${pad}" y="${pad - 12}" font-size="11" fill="#64748B">Temp °C (line) · amber band = best ${winLen}-min window</text>
+      <text x="${pad}" y="${pad - 12}" font-size="11" fill="#64748B">Temp °F (line) · amber band = best ${winLen}-min window</text>
     </svg>
   `;
 }
