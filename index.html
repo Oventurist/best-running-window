@@ -146,10 +146,17 @@
         </div>
         <!-- Run Length -->
         <div class="flex flex-col space-y-base md:w-1/2">
-          <label class="font-label-bold text-label-bold text-on-surface uppercase" for="duration">Run length (minutes)</label>
-          <div class="relative">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline field-icon" style="font-variation-settings: 'FILL' 0;">timer</span>
-            <input class="w-full bg-cool-gray-100 border-none rounded-lg py-3 pl-10 pr-4 text-body-md focus:ring-2 focus:ring-vibrant-mint focus:bg-surface-container-lowest transition-all duration-200" id="duration" name="duration" placeholder="e.g. 45" type="number" min="1" max="600" value="45" required>
+          <label class="font-label-bold text-label-bold text-on-surface uppercase" for="duration-h">Run length</label>
+          <div class="flex items-center gap-2">
+            <div class="relative flex-1">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline field-icon" style="font-variation-settings: 'FILL' 0;">timer</span>
+              <input class="w-full bg-cool-gray-100 border-none rounded-lg py-3 pl-10 pr-4 text-body-md focus:ring-2 focus:ring-vibrant-mint focus:bg-surface-container-lowest transition-all duration-200" id="duration-h" name="duration-h" placeholder="1" type="number" min="0" max="24" value="0" required>
+            </div>
+            <span class="font-label-bold text-label-bold text-on-surface">h</span>
+            <div class="relative flex-1">
+              <input class="w-full bg-cool-gray-100 border-none rounded-lg py-3 px-4 text-body-md focus:ring-2 focus:ring-vibrant-mint focus:bg-surface-container-lowest transition-all duration-200" id="duration-m" name="duration-m" placeholder="45" type="number" min="0" max="59" value="45" required>
+            </div>
+            <span class="font-label-bold text-label-bold text-on-surface">m</span>
           </div>
         </div>
         <!-- Shaded Route Toggle -->

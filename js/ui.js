@@ -4,6 +4,14 @@ export function minutesToHHMM(min) {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 }
 
+export function formatRunLength(min) {
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  if (h && m) return `${h}h ${m}m`;
+  if (h) return `${h}h`;
+  return `${m}m`;
+}
+
 const cToF = (c) => c * 9 / 5 + 32;
 
 export function renderResults(el, { window, wbgtPerMin, runLengthMin, shaded }) {
@@ -18,7 +26,7 @@ export function renderResults(el, { window, wbgtPerMin, runLengthMin, shaded }) 
       <span class="result-time">${minutesToHHMM(window.startMin)} – ${minutesToHHMM(window.endMin)}</span>
     </div>
     <div class="result-stats">
-      <div><span class="stat">Run length</span><strong>${runLengthMin} min</strong></div>
+      <div><span class="stat">Run length</span><strong>${formatRunLength(runLengthMin)}</strong></div>
       <div><span class="stat">Avg WBGT</span><strong>${cToF(window.meanWBGT).toFixed(1)}°F</strong></div>
       <div><span class="stat">Heat-stress rank</span><strong>${'★'.repeat(stars)}${'☆'.repeat(5 - stars)} (${rank}%)</strong></div>
       <div><span class="stat">Day range</span><strong>${cToF(minW).toFixed(1)}–${cToF(maxW).toFixed(1)}°F</strong></div>

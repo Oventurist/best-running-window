@@ -25,7 +25,13 @@ form.addEventListener('submit', async (e) => {
   resultsEl.hidden = true;
   chartEl.hidden = true;
   const zip = form.zipcode.value.trim();
-  const runLengthMin = parseInt(form.duration.value, 10);
+  const h = parseInt(form['duration-h'].value, 10) || 0;
+  const m = parseInt(form['duration-m'].value, 10) || 0;
+  const runLengthMin = h * 60 + m;
+  if (!(runLengthMin >= 1 && runLengthMin <= 600)) {
+    showError(errorEl, 'Enter a run length between 1 minute and 10 hours.');
+    return;
+  }
   const shaded = form.toggle.checked;
   const dateISO = form.date.value; // 'YYYY-MM-DD'
   try {
