@@ -105,11 +105,12 @@ with vanilla JS suffices for this compute load. If the user prefers a framework,
 - WBGT values are computed (not fabricated) from real fetched data.
 - Shaded/sun toggle visibly changes the suggested window.
 
-## Open questions for user (to resolve in spec review)
-- Q1: Vanilla JS vs. a framework (React/Next)? → **proposed vanilla JS**
-- Q2: GitHub Pages deployment target? → **proposed yes**
-- Q3: Display "cardiovascular strain rank" (percentile/star) alongside WBGT? → **proposed yes**
-- Q4: Include "shaded route" toggle (uses T_g ≈ T_a)? → **proposed yes**
+## Approved decisions (user green-lit 2026-08-21)
+- **Q1: Vanilla JS (HTML/CSS/Tailwind), no framework.** ✅
+- **Q2: GitHub Pages deployment (static, no backend).** ✅
+- **Q3: Display WBGT + "cardiovascular strain rank" (percentile/star), NO fabricated BPM.** ✅
+- **Q4: Include "shaded route" toggle (uses T_g ≈ T_a).** ✅
+- **Q5: No runner profile collection — environment-only per research.** ✅
 
 ---
 *Spec authored 2026-08-20. References in `research-wbgt-heart-rate-running/`.*
