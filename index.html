@@ -124,12 +124,12 @@
 
 <main class="flex-grow pt-16 md:pt-24 flex flex-col items-center">
   <!-- Hero Section -->
-  <section class="w-full relative h-[55vh] min-h-[420px] flex items-end pb-stack-lg px-margin-mobile md:px-margin-desktop bg-cool-gray-900 overflow-hidden">
-    <picture class="absolute inset-0 -z-10">
+  <section class="w-full relative h-[55vh] min-h-[420px] flex items-end pb-stack-lg px-margin-mobile md:px-margin-desktop overflow-hidden">
+    <picture class="absolute inset-0 z-0">
       <source srcset="assets/banner.webp" type="image/webp">
-      <img src="assets/banner.jpg" alt="Trail runner at sunrise in the alpine mountains" class="w-full h-full object-cover object-center" style="object-position: center 35%;">
+      <img src="assets/banner.jpg" alt="Trail runner at sunrise in the alpine mountains" class="w-full h-full object-cover" style="object-position: center 35%;">
     </picture>
-    <div class="absolute inset-0 hero-gradient"></div>
+    <div class="absolute inset-0 hero-gradient z-[1]"></div>
     <div class="relative z-10 w-full max-w-container-max mx-auto text-on-primary">
       <h2 class="font-display-lg text-display-lg mb-stack-sm md:w-2/3 lg:w-1/2 leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">Find Your Best Running Window</h2>
       <p class="font-body-lg text-body-lg text-white md:w-1/2 opacity-95 drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">The coolest, lowest-heat-stress minutes of your day — to the nearest minute.</p>
@@ -167,7 +167,7 @@
           </div>
         </div>
         <!-- Shaded Route Toggle -->
-        <div class="flex items-center justify-between py-stack-sm border-t border-surface-variant md:w-1/2 mt-stack-md pt-stack-md">
+        <div class="flex items-center justify-between py-stack-md border-t border-surface-variant mt-stack-md">
           <div class="flex items-center gap-3">
             <span class="material-symbols-outlined text-vibrant-mint" style="font-variation-settings: 'FILL' 0;">park</span>
             <div>
@@ -175,7 +175,7 @@
               <span class="font-label-sm text-label-sm text-on-surface-variant">Prioritize paths with no direct sun</span>
             </div>
           </div>
-          <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+          <div class="relative inline-block w-12 h-6 mr-2 shrink-0">
             <input class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-surface-variant focus:ring-0 focus:outline-none transition-all duration-200 z-10" id="toggle" name="toggle" type="checkbox">
             <label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer transition-colors duration-200" for="toggle"></label>
           </div>
