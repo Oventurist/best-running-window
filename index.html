@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Best Running Window</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <main id="app" class="app-shell">
+    <header class="hero">
+      <h1>Find Your Best Running Window</h1>
+      <p class="subtitle">The coolest, lowest-heat-stress minutes of your day — to the nearest minute.</p>
+    </header>
+    <form id="form" class="card" aria-label="Run window inputs"></form>
+    <section id="results" class="results" aria-live="polite"></section>
+    <section id="chart" class="chart-card" aria-label="24-hour weather timeline"></section>
+  </main>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "best-running-window",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "dev": "npx serve ."
+  },
+  "devDependencies": { "vitest": "^2.1.0" }
+}

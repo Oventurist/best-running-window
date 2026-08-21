@@ -1,0 +1,42 @@
+:root {
+  --color-primary: #0284C7;
+  --color-accent: #F59E0B;
+  --color-background: #F0F9FF;
+  --color-foreground: #0F172A;
+  --color-muted: #EFF7FB;
+  --color-border: #E0F0F8;
+  --color-on-primary: #FFFFFF;
+  --color-ring: #0284C7;
+  --color-destructive: #DC2626;
+  --space-section: 48px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #0B1120;
+    --color-foreground: #E2E8F0;
+    --color-muted: #111c33;
+    --color-border: #1e2d47;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  line-height: 1.5;
+}
+.app-shell { max-width: 880px; margin: 0 auto; padding: var(--space-section) 20px; }
+.hero h1 { font-size: 2rem; font-weight: 700; margin: 0 0 8px; }
+.subtitle { color: #475569; font-size: 1.05rem; margin: 0 0 var(--space-section); }
+@media (prefers-color-scheme: dark) { .subtitle { color: #94A3B8; } }
+.card, .chart-card {
+  background: var(--color-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+button, input, select { font-family: inherit; font-size: 1rem; }
+:focus-visible { outline: 2px solid var(--color-ring); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
