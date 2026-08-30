@@ -50,5 +50,7 @@ describe('ui render', () => {
     const amberEls = [...svg.querySelectorAll('[stroke="#2DD4BF"], [fill="#2DD4BF"]')];
     expect(amberEls.length).toBeGreaterThanOrEqual(3);
     expect(el.innerHTML).toContain('Testville');
+    // lines are smoothed (cubic Bézier curve commands, not just M/L polyline)
+    expect(el.innerHTML).toMatch(/C[\d.]+,[\d.]+\s[\d.]+,[\d.]+\s[\d.]+,[\d.]+/);
   });
 });

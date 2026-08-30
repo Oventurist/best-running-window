@@ -18,9 +18,28 @@ export function renderTimeline(el, { minute, wbgtPerMin, comfortPerMin, window, 
         return wbgtPerMin.map((w) => 100 * (wMax - w) / span);
       })();
   const yC = (v) => pad + (1 - v / 100) * (H - 2 * pad);
-  const comfortPath = score.map((v, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${yC(v).toFixed(1)}`).join(' ');
-
-  const tempPath = tempsF.map((v, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${yT(v).toFixed(1)}`).join(' ');
+  // Smooth a list of [x,y] points into a Catmull-Rom -> cubic Bézier path.
+  // Keeps every 1-min sample (no resolution loss) but renders as a curve.
+  const smoothPath = (pts) => {
+    if (pts.length < 2) return '';
+    let d = `M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[i - 1] || pts[i];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[i + 2] || p2;
+      const cp1x = p1[0] + (p2[0] - p0[0]) / 6;
+      const cp1y = p1[1] + (p2[1] - p0[1]) / 6;
+      const cp2x = p2[0] - (p3[0] - p1[0]) / 6;
+      const cp2y = p2[1] - (p3[1] - p1[1]) / 6;
+      d += ` C${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`;
+    }
+    return d;
+  };
+  const comfortPts = score.map((v, i) => [x(i), yC(v)]);
+  const tempPts = tempsF.map((v, i) => [x(i), yT(v)]);
+  const comfortPath = smoothPath(comfortPts);
+  const tempPath = smoothPath(tempPts);
   const xs = x(window.startMin), xe = x(window.endMin);
   const winLen = window.endMin - window.startMin;
 
