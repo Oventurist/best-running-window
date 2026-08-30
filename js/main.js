@@ -1,5 +1,5 @@
 import { geocodeZip, fetchWeather, fetchAirQuality } from './api.js';
-import { interpolateHourly } from './interpolate.js';
+import { interpolateHourly, interpolateSeries } from './interpolate.js';
 import { computeWBGT } from './wbgt.js';
 import { computeComfortIndex, findBestComfortWindow, SESSION_LABELS } from './comfort.js';
 import { renderResults, showError } from './ui.js';
@@ -43,7 +43,7 @@ form.addEventListener('submit', async (e) => {
     let aqiPerMin = null;
     try {
       const air = await fetchAirQuality(lat, lon, dateISO);
-      aqiPerMin = interpolateHourly({ time: air.time, us_aqi: air.us_aqi }).us_aqi;
+      aqiPerMin = interpolateSeries(air.time, air.us_aqi);
     } catch (_) { aqiPerMin = null; }
     const minute = interpolateHourly(raw);
     const wbgtPerMin = computeWBGT(minute, { shaded });

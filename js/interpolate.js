@@ -32,3 +32,23 @@ export function interpolateHourly(hourly) {
   }
   return out;
 }
+
+// Generic linear interpolation of a single hourly series to 1-minute resolution.
+// Used for non-weather series (e.g. air-quality us_aqi) that don't share the
+// fixed weather key set in interpolateHourly.
+export function interpolateSeries(hourlyTime, values) {
+  const n = hourlyTime.length;
+  if (!values || n === 0) return [];
+  if (n === 1) return [values[0]];
+  const gaps = n - 1;
+  const total = gaps * 60 + 1;
+  const out = new Array(total);
+  for (let k = 0; k < total; k++) {
+    const pos = k / 60;
+    const i = Math.min(Math.floor(pos), gaps - 1);
+    const frac = pos - i;
+    const va = values[i], vb = values[i + 1];
+    out[k] = va + (vb - va) * frac;
+  }
+  return out;
+}

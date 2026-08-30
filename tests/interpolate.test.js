@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { interpolateHourly } from '../js/interpolate.js';
+import { interpolateHourly, interpolateSeries } from '../js/interpolate.js';
 
 describe('interpolateHourly', () => {
   const base = {
@@ -35,5 +35,21 @@ describe('interpolateHourly', () => {
     const single = { ...base, time: ['2026-08-21T00:00'], temperature_2m: [20], relative_humidity_2m: [80], wind_speed_10m: [3], cloud_cover: [10], shortwave_radiation: [0] };
     const out = interpolateHourly(single);
     expect(out.temperature_2m.length).toBe(1);
+  });
+});
+
+describe('interpolateSeries', () => {
+  it('produces 121 points for 3 hourly samples', () => {
+    const out = interpolateSeries(['t0', 't1', 't2'], [10, 20, 30]);
+    expect(out).toHaveLength(121);
+    expect(out[0]).toBe(10);
+    expect(out[120]).toBe(30);
+    expect(out[60]).toBeCloseTo(20, 5);
+    expect(out[30]).toBeCloseTo(15, 5);
+  });
+
+  it('returns single value for one sample and [] for empty', () => {
+    expect(interpolateSeries(['t0'], [42])).toEqual([42]);
+    expect(interpolateSeries([], [])).toEqual([]);
   });
 });
