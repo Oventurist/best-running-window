@@ -27,8 +27,8 @@ describe('timeline comfort line', () => {
     // comfort path drawn + timeline title present
     expect(el.innerHTML).toContain('running-comfort timeline');
     expect(el.innerHTML).toMatch(/M[\d.]+,[\d.]+/); // a path starting at M
-    // mint comfort line + navy dashed temp line both present
+    // mint comfort line + navy temp line both present (temp no longer dashed)
     expect(el.innerHTML).toContain('stroke="#2DD4BF"');
-    expect(el.innerHTML).toContain('stroke-dasharray="4 3"');
+    expect(el.innerHTML).not.toContain('stroke-dasharray');
   });
 });
