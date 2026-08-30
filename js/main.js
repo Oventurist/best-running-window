@@ -1,6 +1,7 @@
-import { geocodeZip, fetchWeather } from './api.js';
+import { geocodeZip, fetchWeather, fetchAirQuality } from './api.js';
 import { interpolateHourly } from './interpolate.js';
-import { computeWBGT, findBestWindow } from './wbgt.js';
+import { computeWBGT } from './wbgt.js';
+import { computeComfortIndex, findBestComfortWindow, SESSION_LABELS } from './comfort.js';
 import { renderResults, showError } from './ui.js';
 import { renderTimeline } from './timeline.js';
 
@@ -33,15 +34,40 @@ form.addEventListener('submit', async (e) => {
     return;
   }
   const shaded = form.toggle.checked;
+  const sessionType = form.session.value || 'easy';
   const dateISO = form.date.value; // 'YYYY-MM-DD'
   try {
     const { lat, lon, name } = await geocodeZip(zip);
     const raw = await fetchWeather(lat, lon, dateISO);
+    // Air quality is best-effort; if it fails, comfort index drops that factor.
+    let aqiPerMin = null;
+    try {
+      const air = await fetchAirQuality(lat, lon, dateISO);
+      aqiPerMin = interpolateHourly({ time: air.time, us_aqi: air.us_aqi }).us_aqi;
+    } catch (_) { aqiPerMin = null; }
     const minute = interpolateHourly(raw);
     const wbgtPerMin = computeWBGT(minute, { shaded });
-    const window = findBestWindow(wbgtPerMin, runLengthMin);
-    renderResults(resultsEl, { window, wbgtPerMin, runLengthMin, shaded });
-    renderTimeline(chartEl, { minute, wbgtPerMin, window, shaded, placeName: name });
+    const comfortPerMin = computeComfortIndex({
+      wbgtPerMin,
+      tempPerMinC: minute.temperature_2m,
+      windPerMinMs: minute.wind_speed_10m,
+      precipPerMinPct: minute.precipitation_probability,
+      aqiPerMin,
+      sessionType
+    });
+    const window = findBestComfortWindow(comfortPerMin, runLengthMin);
+    // mean WBGT across the chosen window for the stats readout
+    let meanWBGT = 0;
+    for (let i = window.startMin; i < window.endMin; i++) meanWBGT += wbgtPerMin[i];
+    meanWBGT /= (window.endMin - window.startMin);
+    window.meanWBGT = meanWBGT;
+    renderResults(resultsEl, {
+      window, comfortPerMin, wbgtPerMin, runLengthMin, shaded,
+      sessionType, sessionLabel: SESSION_LABELS[sessionType], aqiAvailable: aqiPerMin !== null
+    });
+    renderTimeline(chartEl, {
+      minute, wbgtPerMin, comfortPerMin, window, shaded, placeName: name, sessionType
+    });
     resultsEl.hidden = false;
     chartEl.hidden = false;
   } catch (err) {

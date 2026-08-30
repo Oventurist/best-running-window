@@ -13,17 +13,22 @@ describe('ui render', () => {
     const el = document.getElementById('r');
     const wbgt = [10, 20, 30]; // min 10, max 30
     renderResults(el, {
-      window: { startMin: 150, endMin: 195, meanWBGT: 12 },
+      window: { startMin: 150, endMin: 195, meanWBGT: 12, score: 82 },
+      comfortPerMin: [82],
       wbgtPerMin: wbgt,
       runLengthMin: 45,
-      shaded: false
+      shaded: false,
+      sessionType: 'easy',
+      sessionLabel: 'Easy',
+      aqiAvailable: false
     });
     expect(el.innerHTML).toContain('02:30'); // 150 min
     expect(el.innerHTML).toContain('03:15'); // 195 min
     expect(el.innerHTML).toContain('53.6°F'); // avg WBGT (12°C -> 53.6°F)
     expect(el.innerHTML).toContain('Open sun');
+    expect(el.innerHTML).toContain('Comfort score'); // new comfort metric
     expect(el.innerHTML).toMatch(/★|☆/); // star rank present
-    expect(el.innerHTML).toContain('does not predict BPM'); // honest disclaimer
+    expect(el.innerHTML).toContain('not a heart-rate prediction'); // honest disclaimer
   });
 
   it('renderTimeline draws SVG with highlighted band at window', async () => {

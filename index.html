@@ -159,6 +159,19 @@
             <span class="font-label-bold text-label-bold text-on-surface">m</span>
           </div>
         </div>
+        <!-- Session Type -->
+        <div class="flex flex-col space-y-base md:w-1/2">
+          <label class="font-label-bold text-label-bold text-on-surface uppercase" for="session">Session type</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline field-icon" style="font-variation-settings: 'FILL' 0;">directions_run</span>
+            <select class="w-full bg-cool-gray-100 border-none rounded-lg py-3 pl-10 pr-4 text-body-md focus:ring-2 focus:ring-vibrant-mint focus:bg-surface-container-lowest transition-all duration-200 text-on-surface cursor-pointer" id="session" name="session" required>
+              <option value="easy">Easy / recovery</option>
+              <option value="tempo">Tempo</option>
+              <option value="intervals">Intervals / VO2</option>
+              <option value="long">Long run</option>
+            </select>
+          </div>
+        </div>
         <!-- Shaded Route Toggle -->
         <div class="flex items-center justify-between py-stack-md border-t border-surface-variant mt-stack-md">
           <div class="flex items-center gap-3">

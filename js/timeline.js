@@ -1,4 +1,4 @@
-export function renderTimeline(el, { minute, wbgtPerMin, window, shaded, placeName }) {
+export function renderTimeline(el, { minute, wbgtPerMin, comfortPerMin, window, shaded, placeName, sessionType }) {
   const W = 800, H = 320, pad = 40;
   const n = wbgtPerMin.length;
   if (n === 0) { el.innerHTML = ''; return; }
@@ -8,11 +8,15 @@ export function renderTimeline(el, { minute, wbgtPerMin, window, shaded, placeNa
   const tMin = Math.min(...tempsF), tMax = Math.max(...tempsF);
   const yT = (v) => H - pad - ((v - tMin) / (tMax - tMin || 1)) * (H - 2 * pad);
 
-  // Running-comfort score: WBGT inverted & normalized 0..100 across the day.
-  // Higher = better (cooler + lower solar load). The mint band will sit at the peak.
-  const wMin = Math.min(...wbgtPerMin), wMax = Math.max(...wbgtPerMin);
-  const span = (wMax - wMin) || 1;
-  const score = wbgtPerMin.map((w) => 100 * (wMax - w) / span);
+  // Running-comfort score: passed in (session-aware, 0..100). Higher = better.
+  // Falls back to WBGT-inverted if comfortPerMin not supplied.
+  const score = (comfortPerMin && comfortPerMin.length === n)
+    ? comfortPerMin
+    : (() => {
+        const wMin = Math.min(...wbgtPerMin), wMax = Math.max(...wbgtPerMin);
+        const span = (wMax - wMin) || 1;
+        return wbgtPerMin.map((w) => 100 * (wMax - w) / span);
+      })();
   const yC = (v) => pad + (1 - v / 100) * (H - 2 * pad);
   const comfortPath = score.map((v, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${yC(v).toFixed(1)}`).join(' ');
 
