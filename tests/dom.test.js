@@ -29,10 +29,11 @@ describe('session-type help popover (real DOM)', () => {
     expect(btn.getAttribute('aria-expanded')).toBe('false');
   });
 
-  it('popover explains all four session types', () => {
+  it('popover explains all four session types with typical durations', () => {
     const txt = document.getElementById('session-help-pop').textContent;
     for (const t of ['Easy / recovery', 'Tempo', 'Intervals / VO2', 'Long run']) {
       expect(txt).toContain(t);
     }
+    expect(txt).toContain('Typical: 60–120+ min.'); // long-run duration guidance
   });
 });
