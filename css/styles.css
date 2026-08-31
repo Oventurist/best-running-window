@@ -71,6 +71,44 @@ body {
 .chart-card svg { width: 100%; height: auto; display: block; }
 .chart-title { font-family: 'Montserrat', sans-serif; font-size: 1.25rem; font-weight: 700; margin: 0 0 16px; }
 
+/* Draggable run-window band */
+.window-band { cursor: grab; touch-action: none; }
+.window-band:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.window-band:focus-visible #band-rect { stroke: #2DD4BF; stroke-width: 1.5; }
+.window-band.is-dragging { cursor: grabbing; }
+.window-band .band-hit { cursor: grab; }
+.window-band.is-dragging .band-hit { cursor: grabbing; }
+
+/* Improved legend */
+.chart-legend {
+  display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center;
+  margin-top: 14px; padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 0.85rem; color: var(--on-surface-variant);
+}
+.legend-item { display: inline-flex; align-items: center; gap: 8px; }
+.legend-note { opacity: 0.7; }
+.legend-swatch {
+  width: 22px; height: 0; flex: 0 0 auto; border-radius: 2px;
+  border-top-width: 3px; border-top-style: solid;
+}
+.legend-swatch--mint { border-top-color: #2DD4BF; }
+.legend-swatch--navy { border-top-color: #020617; }
+.legend-swatch--band { height: 14px; border-top: none; border-radius: 3px; background: rgba(45, 212, 191, 0.25); border: 1px solid #2DD4BF; box-shadow: inset 0 0 0 1px rgba(45, 212, 191, 0.4); }
+
+/* Reset-to-best-window button under the chart */
+.chart-actions { margin-top: 14px; display: flex; justify-content: flex-end; }
+.window-reset-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font: 600 0.8rem/1 'Inter', sans-serif; letter-spacing: 0.03em; text-transform: uppercase;
+  color: #2DD4BF; background: transparent;
+  border: 1px solid #2DD4BF; border-radius: 0.5rem; padding: 8px 14px;
+  cursor: pointer; transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+.window-reset-btn:hover { background: rgba(45, 212, 191, 0.12); }
+.window-reset-btn:active { transform: scale(0.98); }
+.window-reset-btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+
 /* Focus visibility for keyboard users */
 :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 

@@ -11,10 +11,13 @@ describe('ui render', () => {
   it('renderResults shows window time, WBGT, and strain rank', async () => {
     const { renderResults } = await import('../js/ui.js');
     const el = document.getElementById('r');
-    const wbgt = [10, 20, 30]; // min 10, max 30
+    // Coherent 24h-scale fixtures: constant 12°C WBGT and 82 comfort across the
+    // day so the 150–195 window averages to 12°C (53.6°F) and score 82.
+    const wbgt = new Array(1440).fill(12);
+    const comfort = new Array(1440).fill(82);
     renderResults(el, {
-      window: { startMin: 150, endMin: 195, meanWBGT: 12, score: 82 },
-      comfortPerMin: [82],
+      window: { startMin: 150, endMin: 195 },
+      comfortPerMin: comfort,
       wbgtPerMin: wbgt,
       runLengthMin: 45,
       shaded: false,

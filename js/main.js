@@ -2,7 +2,7 @@ import { geocodeZip, fetchWeather, fetchAirQuality } from './api.js';
 import { interpolateHourly, interpolateSeries } from './interpolate.js';
 import { computeWBGT } from './wbgt.js';
 import { computeComfortIndex, findBestComfortWindow, SESSION_LABELS } from './comfort.js';
-import { renderResults, showError } from './ui.js';
+import { renderResults, updateWindowStats, showError } from './ui.js';
 import { renderTimeline } from './timeline.js';
 
 const form = document.getElementById('form');
@@ -100,7 +100,15 @@ form.addEventListener('submit', async (e) => {
       sessionType, sessionLabel: SESSION_LABELS[sessionType], aqiAvailable: aqiPerMin !== null
     });
     renderTimeline(chartEl, {
-      minute, wbgtPerMin, comfortPerMin, window, shaded, placeName: name, sessionType
+      minute, wbgtPerMin, comfortPerMin, window, shaded, placeName: name, sessionType,
+      onWindowChange: (startMin) => {
+        window.startMin = startMin;
+        // In-place update of the dynamic stat nodes — smooth real-time feel,
+        // no full re-render (which would flicker on every drag pixel).
+        updateWindowStats(resultsEl, {
+          window, wbgtPerMin, comfortPerMin, lengthMin: window.endMin - window.startMin
+        });
+      }
     });
     resultsEl.hidden = false;
     chartEl.hidden = false;
