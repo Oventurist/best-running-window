@@ -51,7 +51,7 @@ export function renderTimeline(el, { minute, wbgtPerMin, comfortPerMin, window, 
     return d;
   };
   const comfortPts = smoothSeries(score, 15).map((v, i) => [x(i), yC(v)]);
-  const tempPts = smoothSeries(tempsF, 5).map((v, i) => [x(i), yT(v)]);
+  const tempPts = smoothSeries(tempsF, 15).map((v, i) => [x(i), yT(v)]);
   const comfortPath = smoothPath(comfortPts);
   const tempPath = smoothPath(tempPts);
   const xs = x(window.startMin), xe = x(window.endMin);
