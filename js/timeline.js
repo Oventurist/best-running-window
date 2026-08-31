@@ -18,6 +18,20 @@ export function renderTimeline(el, { minute, wbgtPerMin, comfortPerMin, window, 
         return wbgtPerMin.map((w) => 100 * (wMax - w) / span);
       })();
   const yC = (v) => pad + (1 - v / 100) * (H - 2 * pad);
+  // Centered moving average to soften threshold-driven cliffs in the plotted
+  // series (e.g. comfort drops sharply as temp crosses a band). Only affects the
+  // drawn line; the underlying 1-min values still drive the window calc.
+  const smoothSeries = (arr, half) => {
+    const out = new Array(arr.length);
+    for (let i = 0; i < arr.length; i++) {
+      let sum = 0, cnt = 0;
+      for (let j = i - half; j <= i + half; j++) {
+        if (j >= 0 && j < arr.length) { sum += arr[j]; cnt++; }
+      }
+      out[i] = sum / cnt;
+    }
+    return out;
+  };
   // Smooth a list of [x,y] points into a Catmull-Rom -> cubic Bézier path.
   // Keeps every 1-min sample (no resolution loss) but renders as a curve.
   const smoothPath = (pts) => {
@@ -36,8 +50,8 @@ export function renderTimeline(el, { minute, wbgtPerMin, comfortPerMin, window, 
     }
     return d;
   };
-  const comfortPts = score.map((v, i) => [x(i), yC(v)]);
-  const tempPts = tempsF.map((v, i) => [x(i), yT(v)]);
+  const comfortPts = smoothSeries(score, 15).map((v, i) => [x(i), yC(v)]);
+  const tempPts = smoothSeries(tempsF, 5).map((v, i) => [x(i), yT(v)]);
   const comfortPath = smoothPath(comfortPts);
   const tempPath = smoothPath(tempPts);
   const xs = x(window.startMin), xe = x(window.endMin);
@@ -56,7 +70,7 @@ export function renderTimeline(el, { minute, wbgtPerMin, comfortPerMin, window, 
         const i = Math.min(n - 1, h * 60);
         return `<text x="${x(i).toFixed(1)}" y="${H - pad + 18}" font-size="11" fill="#45464d" text-anchor="middle">${String(h).padStart(2,'0')}:00</text>`;
       }).join('')}
-      <text x="${pad}" y="${pad - 12}" font-size="11" fill="#45464d">Mint line = running comfort (higher = better) · navy dashed = Temp °F · mint band = best ${winLen}-min window</text>
+      <text x="${pad}" y="${pad - 12}" font-size="11" fill="#45464d">Mint line = running comfort (higher = better) · navy = Temp °F · mint band = best ${winLen}-min window</text>
     </svg>
   `;
 }
