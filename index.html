@@ -161,7 +161,19 @@
         </div>
         <!-- Session Type -->
         <div class="flex flex-col space-y-base md:w-1/2">
-          <label class="font-label-bold text-label-bold text-on-surface uppercase" for="session">Session type</label>
+          <div class="flex items-center gap-2">
+            <label class="font-label-bold text-label-bold text-on-surface uppercase" for="session">Session type</label>
+            <button type="button" id="session-help" class="material-symbols-outlined text-outline hover:text-vibrant-mint focus:text-vibrant-mint cursor-pointer leading-none" style="font-variation-settings: 'FILL' 0; font-size: 18px;" aria-expanded="false" aria-controls="session-help-pop" aria-label="What does each session type mean?">help</button>
+          </div>
+          <div id="session-help-pop" class="hidden mt-2 p-3 rounded-lg bg-cool-gray-100 text-body-sm text-on-surface-variant border border-surface-variant" role="tooltip">
+            <p class="font-label-bold text-label-bold text-on-surface mb-1">Pick the kind of run you're doing:</p>
+            <ul class="space-y-1 list-disc list-inside">
+              <li><strong>Easy / recovery</strong> — low effort, short. Comfort weights cold more (you generate little heat).</li>
+              <li><strong>Tempo</strong> — sustained moderate-hard effort. Heat matters more than for easy.</li>
+              <li><strong>Intervals / VO2</strong> — hard, short reps. Heat dumping is the limiter, so hot/humid hurts most; tolerates cold best.</li>
+              <li><strong>Long run</strong> — easy pace but long exposure. Cumulative heat matters, so it favors cooler windows a bit more than easy.</li>
+            </ul>
+          </div>
           <div class="relative">
             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline field-icon" style="font-variation-settings: 'FILL' 0;">directions_run</span>
             <select class="w-full bg-cool-gray-100 border-none rounded-lg py-3 pl-10 pr-4 text-body-md focus:ring-2 focus:ring-vibrant-mint focus:bg-surface-container-lowest transition-all duration-200 text-on-surface cursor-pointer" id="session" name="session" required>

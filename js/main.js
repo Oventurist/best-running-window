@@ -27,6 +27,31 @@ dateInput.addEventListener('focus', openPicker);
   dateInput.value = `${y}-${m}-${d}`;
 })();
 
+// Session-type help popover toggle.
+const helpBtn = document.getElementById('session-help');
+const helpPop = document.getElementById('session-help-pop');
+if (helpBtn && helpPop) {
+  const toggleHelp = () => {
+    const open = helpPop.classList.toggle('hidden') === false;
+    helpBtn.setAttribute('aria-expanded', String(open));
+  };
+  helpBtn.addEventListener('click', (e) => { e.preventDefault(); toggleHelp(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !helpPop.classList.contains('hidden')) {
+      helpPop.classList.add('hidden');
+      helpBtn.setAttribute('aria-expanded', 'false');
+      helpBtn.focus();
+    }
+  });
+  // close when clicking elsewhere
+  document.addEventListener('click', (e) => {
+    if (!helpPop.classList.contains('hidden') && !helpPop.contains(e.target) && e.target !== helpBtn) {
+      helpPop.classList.add('hidden');
+      helpBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   errorEl.hidden = true;
