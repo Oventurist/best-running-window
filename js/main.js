@@ -18,6 +18,15 @@ const openPicker = () => {
 dateInput.addEventListener('click', openPicker);
 dateInput.addEventListener('focus', openPicker);
 
+// Default the date to today (local timezone) so the user doesn't have to pick it.
+(function setDefaultDate() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  dateInput.value = `${y}-${m}-${d}`;
+})();
+
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   errorEl.hidden = true;
