@@ -49,8 +49,8 @@ export function renderTimeline(el, { minute, wbgtPerMin, comfortPerMin, window, 
       <rect x="${xs.toFixed(1)}" y="${pad}" width="${(xe - xs).toFixed(1)}" height="${H - 2 * pad}" fill="#2DD4BF" opacity="0.18" />
       <line x1="${xs.toFixed(1)}" y1="${pad}" x2="${xs.toFixed(1)}" y2="${H - pad}" stroke="#2DD4BF" stroke-width="2" />
       <line x1="${xe.toFixed(1)}" y1="${pad}" x2="${xe.toFixed(1)}" y2="${H - pad}" stroke="#2DD4BF" stroke-width="2" />
-      <path d="${comfortPath}" fill="none" stroke="#2DD4BF" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
-      <path d="${tempPath}" fill="none" stroke="#020617" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+      <path d="${comfortPath}" fill="none" stroke="#2DD4BF" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" shape-rendering="geometricPrecision" />
+      <path d="${tempPath}" fill="none" stroke="#020617" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" shape-rendering="geometricPrecision" />
       <line x1="${pad}" y1="${H - pad}" x2="${W - pad}" y2="${H - pad}" stroke="#c6c6cd" />
       ${[0, 6, 12, 18, 24].map((h) => {
         const i = Math.min(n - 1, h * 60);
