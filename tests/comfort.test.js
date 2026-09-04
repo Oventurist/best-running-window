@@ -85,3 +85,54 @@ describe('findBestComfortWindow', () => {
     expect(findBestComfortWindow([], 30)).toBeNull();
   });
 });
+
+// Audit 6: property-based check — the sliding-window result must agree with a
+// brute-force scan of every window mean, across random arrays (ties included:
+// any start whose mean equals the maximum is acceptable).
+describe('findBestComfortWindow vs brute-force argmax (audit 6)', () => {
+  const windowMean = (arr, s, w) => {
+    let sum = 0;
+    for (let i = s; i < s + w; i++) sum += arr[i];
+    return sum / w;
+  };
+  const bruteBest = (arr, runLen) => {
+    const n = arr.length;
+    const win = Math.min(runLen, n);
+    let best = -Infinity;
+    const bestStarts = [];
+    for (let s = 0; s + win <= n; s++) {
+      const m = windowMean(arr, s, win);
+      if (m > best) { best = m; bestStarts.length = 0; bestStarts.push(s); }
+      else if (m === best) bestStarts.push(s);
+    }
+    return { win, best, bestStarts };
+  };
+
+  it('matches brute-force argmax over 150 random arrays (varied n and window)', () => {
+    for (let t = 0; t < 150; t++) {
+      const n = 1 + Math.floor(Math.random() * 80);
+      const arr = Array.from({ length: n }, () => Math.floor(Math.random() * 101));
+      const runLen = 1 + Math.floor(Math.random() * (n + 2)); // includes win > n clamping
+      const r = findBestComfortWindow(arr, runLen);
+      const { win, best, bestStarts } = bruteBest(arr, runLen);
+      expect(r).not.toBeNull();
+      expect(r.endMin - r.startMin).toBe(win);
+      expect(bestStarts).toContain(r.startMin); // ties allow any maximal start
+      expect(windowMean(arr, r.startMin, win)).toBe(best); // exact: integer inputs
+    }
+  });
+
+  it('edge cases: window == length, window 1, constant array (all ties)', () => {
+    // window == array length: the only possible window
+    expect(findBestComfortWindow([10, 50, 30], 3)).toEqual({ startMin: 0, endMin: 3, score: 30 });
+    // window 1: pure per-minute argmax
+    const single = findBestComfortWindow([4, 9, 1], 1);
+    expect(single.startMin).toBe(1);
+    expect(single.endMin).toBe(2);
+    // constant array: every window ties; first start wins
+    const flat = findBestComfortWindow(new Array(10).fill(42), 4);
+    expect(flat.startMin).toBe(0);
+    expect(flat.endMin).toBe(4);
+    expect(flat.score).toBe(42);
+  });
+});
