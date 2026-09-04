@@ -56,7 +56,7 @@ export function updateWindowStats(el, { window, wbgtPerMin, comfortPerMin, lengt
   return window;
 }
 
-export function renderResults(el, { window, comfortPerMin, wbgtPerMin, runLengthMin, shaded, sessionType, sessionLabel, aqiAvailable, place }) {
+export function renderResults(el, { window, comfortPerMin, wbgtPerMin, runLengthMin, shaded, sessionType: _sessionType, sessionLabel, aqiAvailable, place }) {
   const minW = Math.min(...wbgtPerMin);
   const maxW = Math.max(...wbgtPerMin);
   const s = summarizeWindow(comfortPerMin, wbgtPerMin, window.startMin, window.endMin - window.startMin);

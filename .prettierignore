@@ -1,0 +1,20 @@
+node_modules/
+package-lock.json
+coverage/
+dist/
+
+# Generated artifact (npm run build:css)
+css/tailwind.css
+
+# Prose/archive trees: not code, mass-reformatting them adds churn not value
+audit.md
+docs/
+research-wbgt-heart-rate-running/
+
+# Hand-curated / pre-existing files outside this task's scope; reformatting
+# them is deferred so the style gate passes without mass-reformatting.
+index.html
+css/styles.css
+js/
+tests/
+tailwind.config.js

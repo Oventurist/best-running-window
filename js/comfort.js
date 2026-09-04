@@ -74,7 +74,6 @@ export function computeComfortIndex({
   const w = SESSION_WEIGHTS[type];
   const n = wbgtPerMin.length;
   const out = new Array(n);
-  let aqiAvailable = false;
   for (let i = 0; i < n; i++) {
     const f = C_TO_F(tempPerMinC[i]);
     const wf = C_TO_F(wbgtPerMin[i]);
@@ -83,14 +82,12 @@ export function computeComfortIndex({
     const sWind = windScore(windPerMinMs[i], type);
     const sPrecip = precipScore(precipPerMinPct ? precipPerMinPct[i] : 0);
     const sAqi = aqiScore(aqiPerMin ? aqiPerMin[i] : null, type);
-    let weights = { ...w };
     if (sAqi == null) {
       // renormalize without aqi
       const { aqi, ...rest } = w;
       const sum = Object.values(rest).reduce((a, b) => a + b, 0);
       const renorm = {};
       for (const k of Object.keys(rest)) renorm[k] = rest[k] / sum;
-      weights = renorm;
       out[i] = Math.round(
         100 * (
           renorm.temp * sTemp +

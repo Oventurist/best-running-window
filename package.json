@@ -5,10 +5,17 @@
   "scripts": {
     "test": "vitest run",
     "dev": "npx serve .",
-    "build:css": "tailwindcss -i ./css/tailwind.input.css -o ./css/tailwind.css --minify"
+    "build:css": "tailwindcss -i ./css/tailwind.input.css -o ./css/tailwind.css --minify",
+    "lint": "eslint .",
+    "format:check": "prettier --check .",
+    "check": "npm run lint && npm run format:check && vitest run"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "globals": "^17.12.0",
     "jsdom": "^29.1.1",
+    "prettier": "^3.9.6",
     "tailwindcss": "^3.4.19",
     "vitest": "^2.1.0"
   }

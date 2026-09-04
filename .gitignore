@@ -1,4 +1,5 @@
 node_modules/
-package-lock.json
 *.log
 .DS_Store
+
+# package-lock.json is committed so CI can run `npm ci`

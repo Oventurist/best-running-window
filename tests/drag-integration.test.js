@@ -86,7 +86,6 @@ describe('drag window band updates stats in real time (end-to-end)', () => {
 
     // Simulate a drag: grab at band, move pointer to a later position.
     // clientToMin maps clientX -> x in viewBox; move to far right (x≈760) => late day.
-    const svg = chart.querySelector('svg');
     band.dispatchEvent(new global.window.MouseEvent('pointerdown', { bubbles: true, clientX: 200, clientY: 200, pointerId: 1 }));
     band.dispatchEvent(new global.window.MouseEvent('pointermove', { bubbles: true, clientX: 760, clientY: 200, pointerId: 1 }));
     band.dispatchEvent(new global.window.MouseEvent('pointerup', { bubbles: true, clientX: 760, clientY: 200, pointerId: 1 }));

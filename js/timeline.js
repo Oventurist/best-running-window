@@ -1,6 +1,6 @@
 import { cToF } from './util.js';
 
-export function renderTimeline(el, { minute, wbgtPerMin, comfortPerMin, window, shaded, placeName, sessionType, onWindowChange }) {
+export function renderTimeline(el, { minute, wbgtPerMin, comfortPerMin, window, shaded: _shaded, placeName, sessionType: _sessionType, onWindowChange }) {
   const W = 800, H = 320, pad = 40;
   const n = wbgtPerMin.length;
   if (n === 0) { el.innerHTML = ''; return; }
@@ -127,7 +127,6 @@ export function renderTimeline(el, { minute, wbgtPerMin, comfortPerMin, window, 
   const lineStart = band.querySelector('#band-line-start');
   const lineEnd = band.querySelector('#band-line-end');
   const hit = band.querySelector('.band-hit');
-  const pxPerMin = (W - 2 * pad) / (n - 1);
 
   const moveBand = (s, e) => {
     const sStr = s.toFixed(1), eStr = e.toFixed(1);
