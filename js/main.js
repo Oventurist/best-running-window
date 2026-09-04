@@ -137,6 +137,11 @@ form.addEventListener('submit', async (e) => {
     resultsEl.hidden = false;
     chartEl.hidden = false;
   } catch (err) {
+    // A failed search must not leave the shimmering skeleton under the error
+    // text (review fix 1): clear the results area so the error stands alone.
+    resultsEl.innerHTML = '';
+    resultsEl.hidden = true;
+    chartEl.hidden = true;
     errorEl = showError(errorEl, friendlyError(err));
   } finally {
     setBusy(false);

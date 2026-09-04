@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, vi } from 'vitest';
 import { JSDOM } from 'jsdom';
 import { readFileSync } from 'fs';
 
@@ -69,5 +69,55 @@ describe('AQI failure fallback (audit 6)', () => {
     // Disclaimer reflects the degraded factor set (no air quality).
     expect(results.textContent).not.toContain('and air quality');
     expect(results.textContent).toContain('rain chance');
+  });
+});
+
+// Review fix 1: a failed search must not leave the shimmering skeleton in
+// #results under the error text — the error stands alone.
+describe('failed search clears the loading skeleton (review fix 1)', () => {
+  it('hides and empties the results area when the API call fails', async () => {
+    const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+    const dom = new JSDOM(html, { runScripts: 'outside-only', pretendToBeVisual: true });
+    global.document = dom.window.document;
+    global.window = dom.window;
+    global.Event = dom.window.Event;
+    const form = document.getElementById('form');
+    form.zipcode = document.getElementById('zipcode');
+    form['duration-h'] = document.getElementById('duration-h');
+    form['duration-m'] = document.getElementById('duration-m');
+    form.toggle = document.getElementById('toggle');
+    form.session = document.getElementById('session');
+    form.date = document.getElementById('date');
+
+    // Weather endpoint fails for this search.
+    global.fetch = async (url) => {
+      if (String(url).includes('geocoding-api')) {
+        return { ok: true, json: async () => ({ results: [{ latitude: 37.7, longitude: -122.4, name: 'San Francisco' }] }) };
+      }
+      return { ok: false, status: 503 };
+    };
+
+    // main.js is module-cached from the test above; reset so the submit
+    // listener binds to THIS JSDOM's document.
+    vi.resetModules();
+    await import('../js/main.js');
+    document.getElementById('zipcode').value = '94107';
+    form.dispatchEvent(new global.window.Event('submit', { cancelable: true, bubbles: true }));
+    await new Promise((r) => setTimeout(r, 50));
+
+    const results = document.getElementById('results');
+    const chart = document.getElementById('chart');
+    const error = document.getElementById('error');
+    // Skeleton gone: results area empty and hidden, error stands alone.
+    expect(results.hidden).toBe(true);
+    expect(results.innerHTML).not.toContain('skeleton');
+    expect(results.textContent.trim()).toBe('');
+    expect(chart.hidden).toBe(true);
+    // Friendly error is the only visible trace of the failure.
+    expect(error.hidden).toBe(false);
+    expect(error.textContent).not.toMatch(/503/);
+    expect(error.textContent).toMatch(/couldn't load the forecast/i);
+    // Submit button restored after the busy state.
+    expect(form.querySelector('button[type="submit"]').disabled).toBe(false);
   });
 });

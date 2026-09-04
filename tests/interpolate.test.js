@@ -38,6 +38,22 @@ describe('interpolateHourly', () => {
     expect(out.temperature_2m.length).toBe(1);
   });
 
+  it('single-sample branch keeps ISO time so a 1-hour forecast still gets the dynamic title (review fix 3)', () => {
+    const single = {
+      time: ['2026-08-21T14:00'],
+      temperature_2m: [21],
+      relative_humidity_2m: [70],
+      wind_speed_10m: [3],
+      cloud_cover: [20],
+      shortwave_radiation: [400],
+      precipitation_probability: [10]
+    };
+    const out = interpolateHourly(single);
+    expect(out.time).toEqual(['2026-08-21T14:00']);
+    expect(out.tMin).toEqual([0]);
+    expect(out.temperature_2m).toEqual([21]);
+  });
+
   // Audit 1.2 regression: rain chance must survive interpolation so it can
   // feed the comfort model. Before the fix, minute.precipitation_probability
   // was undefined and precipScore silently scored 0.

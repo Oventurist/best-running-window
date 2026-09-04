@@ -10,6 +10,9 @@ export function interpolateHourly(hourly) {
   const keys = ['temperature_2m', 'relative_humidity_2m', 'wind_speed_10m', 'cloud_cover', 'shortwave_radiation', 'precipitation_probability'];
   if (n === 1) {
     const out = { tMin: [0] };
+    // Keep ISO timestamps so a single-hour forecast still gets the dynamic
+    // title/ticks from audit 1.1.
+    if (hourly.time) out.time = hourly.time;
     for (const key of keys) if (hourly[key]) out[key] = [...hourly[key]];
     return out;
   }
