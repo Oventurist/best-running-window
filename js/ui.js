@@ -12,7 +12,10 @@ export function formatRunLength(min) {
   return `${m}m`;
 }
 
-export { cToF } from './util.js';
+// cToF now lives in util.js (audit 2.3); import binds it for local use and the
+// re-export keeps the existing import path working.
+import { cToF } from './util.js';
+export { cToF };
 
 // Pure window→stats math. Reused for the initial render AND every live
 // drag/keyboard step so there is a single source of truth.
