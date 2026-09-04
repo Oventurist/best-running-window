@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { saturationVaporPressure, naturalWetBulb, blackGlobe, computeWBGT, findBestWindow } from '../js/wbgt.js';
+import { saturationVaporPressure, naturalWetBulb, blackGlobe, computeWBGT } from '../js/wbgt.js';
 
 describe('wbgt core', () => {
   it('saturationVaporPressure positive and rising', () => {
@@ -20,6 +20,16 @@ describe('wbgt core', () => {
     expect(shaded).toBeCloseTo(30, 0);
   });
 
+  // Audit 6 sanity bounds: shaded globe reads exactly air temperature, and
+  // any positive solar load heats the unshaded globe above air temperature.
+  it('blackGlobe sanity: shaded Tg == Ta; unshaded Tg > Ta when solar > 0 (audit 6)', () => {
+    const shaded = blackGlobe(28, 55, 3, 500, true);
+    expect(shaded).toBe(28); // shaded branch returns Ta verbatim
+    for (const solar of [200, 600, 1000]) {
+      expect(blackGlobe(28, 55, 3, solar, false)).toBeGreaterThan(28);
+    }
+  });
+
   it('computeWBGT returns one value per minute', () => {
     const md = {
       temperature_2m: [25, 25], relative_humidity_2m: [60, 60],
@@ -29,20 +39,5 @@ describe('wbgt core', () => {
     expect(out.length).toBe(2);
     expect(out[0]).toBeGreaterThan(0);
   });
-
-  it('findBestWindow finds minimum mean over a flat plateau at edges', () => {
-    // 10 minutes: WBGT descends then flat — lowest window should start at 0
-    const wbgt = [10, 10, 10, 12, 12, 12, 12, 12, 12, 12];
-    const r = findBestWindow(wbgt, 3);
-    expect(r.startMin).toBe(0);
-    expect(r.endMin).toBe(3);
-    expect(r.meanWBGT).toBeCloseTo(10, 5);
-  });
-
-  it('findBestWindow picks the true minimum plateau', () => {
-    const wbgt = [20, 20, 5, 5, 5, 5, 20, 20];
-    const r = findBestWindow(wbgt, 4);
-    expect(r.startMin).toBe(2);
-    expect(r.meanWBGT).toBeCloseTo(5, 5);
-  });
 });
+// (findBestWindow tests removed with the dead function — audit 2.1.)

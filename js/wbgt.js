@@ -55,18 +55,5 @@ export function computeWBGT(md, { shaded = false } = {}) {
   }
   return out;
 }
-
-export function findBestWindow(wbgt, runLengthMin) {
-  const n = wbgt.length;
-  const L = Math.min(runLengthMin, n);
-  let bestStart = 0, bestMean = Infinity;
-  const windows = [];
-  for (let s = 0; s + L <= n; s++) {
-    let sum = 0;
-    for (let j = s; j < s + L; j++) sum += wbgt[j];
-    const mean = sum / L;
-    windows.push({ start: s, mean });
-    if (mean < bestMean) { bestMean = mean; bestStart = s; }
-  }
-  return { startMin: bestStart, endMin: bestStart + L, meanWBGT: bestMean, allWindows: windows };
-}
+// (findBestWindow and its unused allWindows array deleted — audit 2.1 dead
+// code, superseded by findBestComfortWindow in comfort.js.)

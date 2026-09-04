@@ -3,7 +3,7 @@
 // session type and folds in temp, wind, precip, and air quality.
 // Weights are literature-derived constants (no user tuning). See spec doc.
 
-const C_TO_F = (c) => (c * 9) / 5 + 32;
+import { cToF as C_TO_F } from './util.js';
 
 // Session-type weights for each factor. Sum to 1.0 per tier.
 export const SESSION_WEIGHTS = {

@@ -12,7 +12,7 @@ export function formatRunLength(min) {
   return `${m}m`;
 }
 
-export const cToF = (c) => c * 9 / 5 + 32;
+export { cToF } from './util.js';
 
 // Pure window→stats math. Reused for the initial render AND every live
 // drag/keyboard step so there is a single source of truth.
