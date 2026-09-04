@@ -97,6 +97,11 @@ button[type="submit"]:disabled {
   font-family: 'Montserrat', sans-serif; font-size: 2rem; font-weight: 800;
   color: var(--accent); letter-spacing: -0.02em;
 }
+/* Resolved place line for user verification (audit 1.5) */
+.results .result-place {
+  margin: 0 0 16px; font-size: 0.9rem; color: var(--on-surface-variant);
+}
+.results .result-place strong { color: var(--on-surface); }
 .results .result-stats {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px;
 }

@@ -98,7 +98,7 @@ form.addEventListener('submit', async (e) => {
   const shaded = form.toggle.checked;
   const sessionType = form.session.value || 'easy';
   try {
-    const { lat, lon, name } = await geocodeZip(zip);
+    const { lat, lon, name, state } = await geocodeZip(zip);
     const raw = await fetchWeather(lat, lon, dateISO);
     // Air quality is best-effort; if it fails, comfort index drops that factor.
     let aqiPerMin = null;
@@ -117,14 +117,11 @@ form.addEventListener('submit', async (e) => {
       sessionType
     });
     const window = findBestComfortWindow(comfortPerMin, runLengthMin);
-    // mean WBGT across the chosen window for the stats readout
-    let meanWBGT = 0;
-    for (let i = window.startMin; i < window.endMin; i++) meanWBGT += wbgtPerMin[i];
-    meanWBGT /= (window.endMin - window.startMin);
-    window.meanWBGT = meanWBGT;
+    const place = [name, state].filter(Boolean).join(', ');
     renderResults(resultsEl, {
       window, comfortPerMin, wbgtPerMin, runLengthMin, shaded,
-      sessionType, sessionLabel: SESSION_LABELS[sessionType], aqiAvailable: aqiPerMin !== null
+      sessionType, sessionLabel: SESSION_LABELS[sessionType], aqiAvailable: aqiPerMin !== null,
+      place
     });
     renderTimeline(chartEl, {
       minute, wbgtPerMin, comfortPerMin, window, shaded, placeName: name, sessionType,

@@ -53,7 +53,7 @@ export function updateWindowStats(el, { window, wbgtPerMin, comfortPerMin, lengt
   return window;
 }
 
-export function renderResults(el, { window, comfortPerMin, wbgtPerMin, runLengthMin, shaded, sessionType, sessionLabel, aqiAvailable }) {
+export function renderResults(el, { window, comfortPerMin, wbgtPerMin, runLengthMin, shaded, sessionType, sessionLabel, aqiAvailable, place }) {
   const minW = Math.min(...wbgtPerMin);
   const maxW = Math.max(...wbgtPerMin);
   const s = summarizeWindow(comfortPerMin, wbgtPerMin, window.startMin, window.endMin - window.startMin);
@@ -66,6 +66,7 @@ export function renderResults(el, { window, comfortPerMin, wbgtPerMin, runLength
       <span class="result-label">Best window${sessionLabel ? ` · ${sessionLabel}` : ''}</span>
       <span class="result-time" id="res-time">${minutesToHHMM(window.startMin)} – ${minutesToHHMM(window.endMin)}</span>
     </div>
+    ${place ? `<p class="result-place">Forecast for <strong id="res-place">${place}</strong> — double-check this is the right place.</p>` : ''}
     <div class="result-stats">
       <div><span class="stat">Run length</span><strong>${formatRunLength(runLengthMin)}</strong></div>
       <div><span class="stat">Comfort score</span><strong id="res-comfort">${s.score}/100 ${rating}</strong></div>

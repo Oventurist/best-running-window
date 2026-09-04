@@ -22,15 +22,37 @@ describe('api', () => {
   it('geocodeZip parses json response', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ results: [{ latitude: 40.7, longitude: -74.0, name: 'New York', country: 'United States' }] })
+      json: async () => ({ results: [{ latitude: 40.7, longitude: -74.0, name: 'New York', country: 'United States', country_code: 'US', admin1: 'New York', feature_code: 'PPL', postcodes: ['10001'] }] })
     });
     const r = await geocodeZip('10001');
-    expect(r).toEqual({ lat: 40.7, lon: -74.0, name: 'New York', country: 'United States' });
+    expect(r).toEqual({ lat: 40.7, lon: -74.0, name: 'New York', state: 'New York', country: 'United States' });
+    // audit 1.5: request is US-filtered and asks for several candidates
+    const calledUrl = global.fetch.mock.calls[0][0];
+    expect(calledUrl).toContain('country_code=US');
+    expect(calledUrl).toContain('count=10');
+  });
+
+  it('geocodeZip throws on non-OK response (audit 6 error path)', async () => {
+    global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500 });
+    await expect(geocodeZip('10001')).rejects.toThrow(/geocoding request failed: 500/i);
   });
 
   it('geocodeZip throws when no results', async () => {
     global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ results: [] }) });
     await expect(geocodeZip('00000')).rejects.toThrow(/no matching location/i);
+  });
+
+  it('geocodeZip drops non-US hits and prefers the result covering the queried ZIP (audit 1.5)', async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ results: [
+        { latitude: 1, longitude: 2, name: 'Admin Place', country: 'United States', country_code: 'US', admin1: 'State Y', feature_code: 'ADM2' },
+        { latitude: 40.7, longitude: -74.0, name: 'New York', country: 'United States', country_code: 'US', admin1: 'New York', feature_code: 'PPL', postcodes: ['10001', '10002'] }
+      ] })
+    });
+    const r = await geocodeZip('10001');
+    expect(r.name).toBe('New York');
+    expect(r.state).toBe('New York');
   });
 
   it('fetchWeather returns mapped hourly arrays', async () => {
@@ -48,5 +70,10 @@ describe('api', () => {
     const w = await fetchWeather(40.7, -74.0);
     expect(w.temperature_2m).toEqual([20, 19]);
     expect(w.shortwave_radiation).toEqual([0, 0]);
+  });
+
+  it('fetchWeather throws on non-OK response (audit 6 error path)', async () => {
+    global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 503 });
+    await expect(fetchWeather(40.7, -74.0, '2026-08-21')).rejects.toThrow(/weather request failed: 503/i);
   });
 });
