@@ -8,8 +8,15 @@ import { renderTimeline } from './timeline.js';
 const form = document.getElementById('form');
 const resultsEl = document.getElementById('results');
 const chartEl = document.getElementById('chart');
-const errorEl = document.getElementById('error');
+// showError replaces the #error node so screen readers re-announce (audit 4.2);
+// keep this reference fresh by capturing showError's return value.
+let errorEl = document.getElementById('error');
 const dateInput = document.getElementById('date');
+const submitBtn = form.querySelector('button[type="submit"]');
+
+// Open-Meteo's forecast endpoint serves ~16 days ahead; past dates aren't
+// available through it (audit 4.3).
+const MAX_FORECAST_DAYS = 16;
 
 // Open the native date picker on click/focus so the user doesn't have to use arrow keys.
 const openPicker = () => {
@@ -25,6 +32,16 @@ dateInput.addEventListener('focus', openPicker);
   const m = String(now.getMonth() + 1).padStart(2, '0');
   const d = String(now.getDate()).padStart(2, '0');
   dateInput.value = `${y}-${m}-${d}`;
+})();
+
+// Clamp the date picker to the forecast horizon (audit 4.3), computed fresh on
+// each load so the page never goes stale on a long-lived tab.
+(function clampDateRange() {
+  const pad = (n) => String(n).padStart(2, '0');
+  const iso = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const now = new Date();
+  dateInput.min = iso(now);
+  dateInput.max = iso(new Date(now.getFullYear(), now.getMonth(), now.getDate() + MAX_FORECAST_DAYS));
 })();
 
 // Session-type help popover toggle.
@@ -64,12 +81,22 @@ form.addEventListener('submit', async (e) => {
   const m = parseInt(form['duration-m'].value, 10) || 0;
   const runLengthMin = h * 60 + m;
   if (!(runLengthMin >= 1 && runLengthMin <= 600)) {
-    showError(errorEl, 'Enter a run length between 1 minute and 10 hours.');
+    errorEl = showError(errorEl, 'Enter a run length between 1 minute and 10 hours.');
     return;
   }
+  // Date must sit inside the forecast horizon (audit 4.3): the API serves only
+  // today..+16 days; anything else yields empty data or a confusing error.
+  const todayISO = toISODate(new Date());
+  const maxISO = toISODate(new Date(Date.now() + MAX_FORECAST_DAYS * 86400000));
+  const dateISO = form.date.value; // 'YYYY-MM-DD'
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateISO) || dateISO < todayISO || dateISO > maxISO) {
+    errorEl = showError(errorEl, `Pick a date between ${todayISO} and ${maxISO} — that's the range the forecast covers.`);
+    return;
+  }
+  // Busy state (audit 4.1): block double submits and show progress.
+  setBusy(true);
   const shaded = form.toggle.checked;
   const sessionType = form.session.value || 'easy';
-  const dateISO = form.date.value; // 'YYYY-MM-DD'
   try {
     const { lat, lon, name } = await geocodeZip(zip);
     const raw = await fetchWeather(lat, lon, dateISO);
@@ -113,6 +140,65 @@ form.addEventListener('submit', async (e) => {
     resultsEl.hidden = false;
     chartEl.hidden = false;
   } catch (err) {
-    showError(errorEl, err.message || 'Something went wrong fetching weather.');
+    errorEl = showError(errorEl, friendlyError(err));
+  } finally {
+    setBusy(false);
   }
 });
+
+// Map API failures to plain-language copy (audit 4.2): raw HTTP statuses from
+// api.js never reach the user.
+function friendlyError(err) {
+  const raw = err && err.message ? err.message : '';
+  if (/no matching location/i.test(raw)) {
+    return "That ZIP didn't work — try another one.";
+  }
+  if (/geocoding request failed/i.test(raw)) {
+    return "We couldn't look up that ZIP right now. Check it and try again in a moment.";
+  }
+  if (/weather request failed/i.test(raw)) {
+    return "We couldn't load the forecast for that spot. Please try again in a moment.";
+  }
+  if (/no forecast data/i.test(raw)) {
+    return 'No forecast is available for that date. Pick a date within the next 16 days.';
+  }
+  if (/failed to fetch|networkerror|load failed/i.test(raw)) {
+    return 'Network hiccup — check your connection and try again.';
+  }
+  return raw || 'Something went wrong fetching weather. Please try again.';
+}
+
+// ---- Helpers shared by the submit handler ----
+
+// Local-timezone 'YYYY-MM-DD'.
+function toISODate(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+// Busy state (audit 4.1): disable the submit button with a label change +
+// aria-busy, and show a skeleton over the results area while fetching.
+function setBusy(busy) {
+  if (!submitBtn) return;
+  submitBtn.disabled = busy;
+  submitBtn.setAttribute('aria-busy', String(busy));
+  if (busy) {
+    submitBtn.dataset.originalHtml = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<span class="btn-spinner" aria-hidden="true"></span> Searching…';
+  } else if (submitBtn.dataset.originalHtml) {
+    submitBtn.innerHTML = submitBtn.dataset.originalHtml;
+    delete submitBtn.dataset.originalHtml;
+  }
+  if (busy) {
+    resultsEl.hidden = false;
+    resultsEl.innerHTML = `
+      <div class="skeleton" aria-hidden="true">
+        <div class="skeleton-line skeleton-line--title"></div>
+        <div class="skeleton-grid">
+          ${'<div class="skeleton-line"></div>'.repeat(6)}
+        </div>
+      </div>`;
+  }
+}

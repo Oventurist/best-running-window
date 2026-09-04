@@ -78,7 +78,16 @@ export function renderResults(el, { window, comfortPerMin, wbgtPerMin, runLength
   `;
 }
 
+// Re-show the error in a way screen readers re-announce (audit 4.2): the node
+// is recreated so the role="alert" fires again, then scrolled into view.
 export function showError(el, msg) {
-  el.textContent = msg;
-  el.hidden = false;
+  el.hidden = true;
+  const fresh = el.cloneNode(false);
+  fresh.textContent = msg;
+  fresh.hidden = false;
+  el.parentNode.replaceChild(fresh, el);
+  if (typeof fresh.scrollIntoView === 'function') {
+    fresh.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  return fresh;
 }

@@ -45,6 +45,45 @@ body {
   font-size: 14px;
 }
 
+/* Busy state (audit 4.1): spinner inside the disabled submit button */
+button[type="submit"]:disabled {
+  opacity: 0.75;
+  cursor: progress;
+  transform: none; /* cancel the hover scale while busy */
+}
+.btn-spinner {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  border-radius: 9999px;
+  border: 2px solid rgba(45, 212, 191, 0.35);
+  border-top-color: #2DD4BF;
+  display: inline-block;
+  animation: btn-spin 0.7s linear infinite;
+}
+@keyframes btn-spin { to { transform: rotate(360deg); } }
+
+/* Skeleton placeholder over the results area while fetching (audit 4.1) */
+.skeleton { padding: 8px 0; }
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+.skeleton-line {
+  height: 14px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #e6e8ea 25%, #f2f4f6 50%, #e6e8ea 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.3s ease-in-out infinite;
+}
+.skeleton-line--title { height: 32px; width: 45%; }
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 /* Results */
 .results .result-headline {
   display: flex; justify-content: space-between; align-items: baseline;
