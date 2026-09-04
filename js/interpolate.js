@@ -3,20 +3,20 @@
 export function interpolateHourly(hourly) {
   const n = hourly.temperature_2m.length;
   if (n === 0) return { ...hourly, tMin: [] };
-  if (n === 1) {
-    return {
-      tMin: [0],
-      temperature_2m: [...hourly.temperature_2m],
-      relative_humidity_2m: [...hourly.relative_humidity_2m],
-      wind_speed_10m: [...hourly.wind_speed_10m],
-      cloud_cover: [...hourly.cloud_cover],
-      shortwave_radiation: [...hourly.shortwave_radiation]
-    };
-  }
   const gaps = n - 1;
   const total = gaps * 60 + 1;
-  const keys = ['temperature_2m', 'relative_humidity_2m', 'wind_speed_10m', 'cloud_cover', 'shortwave_radiation'];
+  // precipitation_probability must ride along (audit 1.2) — rain chance feeds
+  // the comfort model per minute; dropping it silently zeroed precip scores.
+  const keys = ['temperature_2m', 'relative_humidity_2m', 'wind_speed_10m', 'cloud_cover', 'shortwave_radiation', 'precipitation_probability'];
+  if (n === 1) {
+    const out = { tMin: [0] };
+    for (const key of keys) if (hourly[key]) out[key] = [...hourly[key]];
+    return out;
+  }
   const out = { tMin: [] };
+  // ISO timestamps ride along (audit 1.1): tick labels and titles are derived
+  // from actual data times, not an assumed 00:00–24:00 axis.
+  if (hourly.time) out.time = hourly.time;
   for (let k = 0; k < total; k++) {
     const pos = (k / 60); // fractional hour index
     const i = Math.min(Math.floor(pos), gaps - 1);
