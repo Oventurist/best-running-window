@@ -48,7 +48,7 @@ export function updateWindowStats(el, { window, wbgtPerMin, comfortPerMin, lengt
   };
   set('res-time', `${minutesToHHMM(s.startMin)} – ${minutesToHHMM(s.endMin)}`);
   set('res-comfort', `${s.score}/100 ${rating}`);
-  set('res-stars', '★'.repeat(stars) + '☆'.repeat(5 - stars));
+  set('res-stars', `${stars} of 5: ${'★'.repeat(stars)}${'☆'.repeat(5 - stars)}`);
   set('res-wbgt', `${cToF(s.meanWBGT).toFixed(1)}°F`);
   return window;
 }
@@ -70,7 +70,7 @@ export function renderResults(el, { window, comfortPerMin, wbgtPerMin, runLength
     <div class="result-stats">
       <div><span class="stat">Run length</span><strong>${formatRunLength(runLengthMin)}</strong></div>
       <div><span class="stat">Comfort score</span><strong id="res-comfort">${s.score}/100 ${rating}</strong></div>
-      <div><span class="stat">Heat-stress rank</span><strong id="res-stars">${'★'.repeat(stars)}${'☆'.repeat(5 - stars)}</strong></div>
+      <div><span class="stat">Heat-stress rank</span><strong id="res-stars" aria-label="${stars} of 5">${'★'.repeat(stars)}${'☆'.repeat(5 - stars)}</strong></div>
       <div><span class="stat">Avg WBGT</span><strong id="res-wbgt">${cToF(s.meanWBGT).toFixed(1)}°F</strong></div>
       <div><span class="stat">Day WBGT range</span><strong>${cToF(minW).toFixed(1)}–${cToF(maxW).toFixed(1)}°F</strong></div>
       <div><span class="stat">Route</span><strong>${shaded ? 'Shaded' : 'Open sun'}</strong></div>

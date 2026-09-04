@@ -1,0 +1,5 @@
+/* Tailwind build input (audit 3.2) — `npm run build:css` compiles this plus the
+ * classes used in index.html / js/* into a static css/tailwind.css. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
