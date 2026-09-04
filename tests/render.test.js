@@ -38,6 +38,7 @@ describe('ui render', () => {
     const { renderTimeline } = await import('../js/timeline.js');
     const el = document.getElementById('c');
     const minute = {
+      time: Array.from({ length: 24 }, (_, h) => `2026-08-31T${String(h).padStart(2, '0')}:00`),
       temperature_2m: Array.from({ length: 1440 }, (_, i) => 15 + 10 * Math.sin(i / 100)),
       relative_humidity_2m: new Array(1440).fill(60),
       wind_speed_10m: new Array(1440).fill(2),
@@ -45,7 +46,8 @@ describe('ui render', () => {
       shortwave_radiation: new Array(1440).fill(0)
     };
     const wbgt = minute.temperature_2m.map((t) => t * 0.9);
-    renderTimeline(el, { minute, wbgtPerMin: wbgt, window: { startMin: 300, endMin: 345 }, shaded: false, placeName: 'Testville' });
+    const comfort = Array.from({ length: 1440 }, (_, i) => 50 + 30 * Math.sin(i / 100));
+    renderTimeline(el, { minute, wbgtPerMin: wbgt, comfortPerMin: comfort, window: { startMin: 300, endMin: 345 }, shaded: false, placeName: 'Testville' });
     const svg = el.querySelector('svg');
     expect(svg).not.toBeNull();
     expect(svg.getAttribute('aria-label')).toContain('highlighted');

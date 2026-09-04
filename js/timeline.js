@@ -1,22 +1,46 @@
+import { cToF } from './util.js';
+
 export function renderTimeline(el, { minute, wbgtPerMin, comfortPerMin, window, shaded, placeName, sessionType, onWindowChange }) {
   const W = 800, H = 320, pad = 40;
   const n = wbgtPerMin.length;
   if (n === 0) { el.innerHTML = ''; return; }
-  const cToF = (c) => c * 9 / 5 + 32;
   const tempsF = minute.temperature_2m.map(cToF);
   const x = (i) => pad + (i / (n - 1)) * (W - 2 * pad);
   const tMin = Math.min(...tempsF), tMax = Math.max(...tempsF);
   const yT = (v) => H - pad - ((v - tMin) / (tMax - tMin || 1)) * (H - 2 * pad);
 
+  // Time axis derived from actual data times (audit 1.1): Open-Meteo returns
+  // ISO timestamps per hour and interpolateHourly carries them through, so a
+  // partial day (e.g. a query at 6pm) plots/ticks only the remaining hours.
+  const hourlyTime = Array.isArray(minute.time) && minute.time.length ? minute.time : null;
+  const nHours = hourlyTime ? hourlyTime.length : Math.ceil(n / 60);
+  const fmtDate = (iso) => {
+    const [y, m, d] = iso.slice(0, 10).split('-').map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+  let title;
+  if (hourlyTime) {
+    const d0 = hourlyTime[0].slice(0, 10);
+    const t0 = hourlyTime[0].slice(11, 16);
+    const dN = hourlyTime[hourlyTime.length - 1].slice(0, 10);
+    title = (d0 === dN && t0 > '00:00') ? 'Remaining hours today' : `Forecast for ${fmtDate(hourlyTime[0])}`;
+  } else {
+    title = 'Running-comfort timeline';
+  }
+  // Tick hour indices spread across the actual data, labeled from the ISO times.
+  const tickHours = (() => {
+    const last = nHours - 1;
+    if (last <= 0) return [0];
+    const idxs = new Set([0, last]);
+    for (let k = 1; k <= 3; k++) idxs.add(Math.round((k * (nHours - 1)) / 4));
+    return [...idxs].sort((a, b) => a - b);
+  })();
+  const tickLabel = (hIdx) => (hourlyTime ? hourlyTime[hIdx].slice(11, 16) : `${String(hIdx).padStart(2, '0')}:00`);
+
   // Running-comfort score: passed in (session-aware, 0..100). Higher = better.
-  // Falls back to WBGT-inverted if comfortPerMin not supplied.
-  const score = (comfortPerMin && comfortPerMin.length === n)
-    ? comfortPerMin
-    : (() => {
-        const wMin = Math.min(...wbgtPerMin), wMax = Math.max(...wbgtPerMin);
-        const span = (wMax - wMin) || 1;
-        return wbgtPerMin.map((w) => 100 * (wMax - w) / span);
-      })();
+  // (Dead WBGT-inverted fallback branch removed — audit 2.5: comfortPerMin is
+  // always supplied and length-matched by the only caller.)
+  const score = comfortPerMin;
   const yC = (v) => pad + (1 - v / 100) * (H - 2 * pad);
   // Centered moving average to soften threshold-driven cliffs in the plotted
   // series (e.g. comfort drops sharply as temp crosses a band). Only affects the
@@ -63,14 +87,14 @@ export function renderTimeline(el, { minute, wbgtPerMin, comfortPerMin, window, 
   const bestEnd = window.endMin;
 
   el.innerHTML = `
-    <h2 class="chart-title">24-hour running-comfort timeline${placeName ? ` — ${placeName}` : ''}</h2>
-    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="24-hour temperature and running-comfort timeline with best run window highlighted" preserveAspectRatio="xMidYMid meet">
+    <h2 class="chart-title">${title}${placeName ? ` — ${placeName}` : ''}</h2>
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${title} — temperature and running-comfort timeline with best run window highlighted" preserveAspectRatio="xMidYMid meet">
       <path d="${comfortPath}" fill="none" stroke="#2DD4BF" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" shape-rendering="geometricPrecision" />
-      <path d="${tempPath}" fill="none" stroke="#020617" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" shape-rendering="geometricPrecision" />
+      <path d="${tempPath}" fill="none" stroke="#020617" stroke-width="2" stroke-dasharray="6 5" stroke-linejoin="round" stroke-linecap="round" shape-rendering="geometricPrecision" />
       <line x1="${pad}" y1="${H - pad}" x2="${W - pad}" y2="${H - pad}" stroke="#c6c6cd" />
-      ${[0, 6, 12, 18, 24].map((h) => {
-        const i = Math.min(n - 1, h * 60);
-        return `<text x="${x(i).toFixed(1)}" y="${H - pad + 18}" font-size="11" fill="#45464d" text-anchor="middle">${String(h).padStart(2,'0')}:00</text>`;
+      ${tickHours.map((hIdx) => {
+        const i = Math.min(n - 1, hIdx * 60);
+        return `<text x="${x(i).toFixed(1)}" y="${H - pad + 18}" font-size="11" fill="#45464d" text-anchor="middle">${tickLabel(hIdx)}</text>`;
       }).join('')}
       <g id="window-band" class="window-band" role="slider" tabindex="0"
          aria-label="Best run window. Drag to choose a different start time, or use arrow keys."
@@ -83,7 +107,7 @@ export function renderTimeline(el, { minute, wbgtPerMin, comfortPerMin, window, 
     </svg>
     <div class="chart-legend" aria-hidden="false">
       <span class="legend-item"><span class="legend-swatch legend-swatch--mint"></span> Running comfort <span class="legend-note">(higher = better)</span></span>
-      <span class="legend-item"><span class="legend-swatch legend-swatch--navy"></span> Temperature (°F)</span>
+      <span class="legend-item"><span class="legend-swatch legend-swatch--navy legend-swatch--dashed"></span> Temperature (°F)</span>
       <span class="legend-item"><span class="legend-swatch legend-swatch--band"></span> Best run window <span class="legend-note">— drag to explore</span></span>
     </div>
     <div class="chart-actions">
