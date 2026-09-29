@@ -1,5 +1,22 @@
 import { cToF } from './util.js';
 
+// Minimum comfortable touch target. Apple HIG says 44pt, Material says 48dp.
+// The band is drawn in viewBox units, so this has to be a px budget converted
+// against the chart's ACTUAL rendered width — a fixed unit count is ~5px on a
+// phone (chart scaled to ~0.41) and ~18px on a desktop.
+export const MIN_TOUCH_TARGET_PX = 44;
+
+// Pad applied around the band on top of the touch-target width, in user units.
+const HIT_PAD_UNITS = 12;
+
+// Convert a px touch budget into viewBox units for the current render size.
+// Falls back to the base pad when the rendered width is unknown (jsdom, or a
+// render before the SVG has been laid out).
+export function hitWidthUnits(renderedWidthPx, viewBoxWidth = 800, base = HIT_PAD_UNITS) {
+  if (!(renderedWidthPx > 0) || !(viewBoxWidth > 0)) return base;
+  return Math.max(base, MIN_TOUCH_TARGET_PX / (renderedWidthPx / viewBoxWidth));
+}
+
 export function renderTimeline(el, { minute, wbgtPerMin, comfortPerMin, window, shaded: _shaded, placeName, sessionType: _sessionType, onWindowChange }) {
   const W = 800, H = 320, pad = 40;
   const n = wbgtPerMin.length;
@@ -128,6 +145,29 @@ export function renderTimeline(el, { minute, wbgtPerMin, comfortPerMin, window, 
   const lineEnd = band.querySelector('#band-line-end');
   const hit = band.querySelector('.band-hit');
 
+  // Measure the SVG's own rendered width. This is 0 while the chart section is
+  // still hidden: main.js un-hides #chart *after* this render returns, so a
+  // one-shot measurement sees a display:none element. The ResizeObserver below
+  // re-runs this the instant the chart actually has a box.
+  const measuredWidth = () => {
+    try {
+      if (svg && typeof svg.getBoundingClientRect === 'function') return svg.getBoundingClientRect().width;
+    } catch (_) { /* not laid out */ }
+    return 0;
+  };
+
+  // Keep the transparent hit rect centred on the visible band while guaranteeing
+  // it is at least a 44px touch target wide. Round UP: rounding to nearest can
+  // shave a fraction of a pixel off the minimum, which is exactly the kind of
+  // thing a test should catch and the user should never feel.
+  const sizeHit = (s, e) => {
+    const span = e - s;
+    const w = Math.max(span + HIT_PAD_UNITS, hitWidthUnits(measuredWidth(), W));
+    const units = Math.ceil(w * 10) / 10;
+    hit.setAttribute('x', (s - (units - span) / 2).toFixed(1));
+    hit.setAttribute('width', units.toFixed(1));
+  };
+
   const moveBand = (s, e) => {
     const sStr = s.toFixed(1), eStr = e.toFixed(1);
     bandRect.setAttribute('x', sStr);
@@ -136,9 +176,31 @@ export function renderTimeline(el, { minute, wbgtPerMin, comfortPerMin, window, 
     lineStart.setAttribute('x2', sStr);
     lineEnd.setAttribute('x1', eStr);
     lineEnd.setAttribute('x2', eStr);
-    hit.setAttribute('x', (s - 6).toFixed(1));
-    hit.setAttribute('width', (e - s + 12).toFixed(1));
+    sizeHit(s, e);
   };
+
+  // Re-size from the band's CURRENT position so this stays correct after a drag
+  // has moved it, rather than reverting to the original best window.
+  const sizeHitCurrent = () => {
+    const bx = parseFloat(bandRect.getAttribute('x'));
+    const bw = parseFloat(bandRect.getAttribute('width'));
+    if (Number.isFinite(bx) && Number.isFinite(bw)) sizeHit(bx, bx + bw);
+  };
+
+  // Best effort for the first paint; the observer corrects it.
+  sizeHit(xs, xe);
+
+  // A ResizeObserver is the only thing that catches the hidden -> visible
+  // transition (that fires no resize event), plus phone rotation and window
+  // resizes, all of which change how many user units make up 44px.
+  // globalThis, not a bare `window`: identical in a browser, but it is the only
+  // reference that reliably resolves to the real global under a test runner.
+  const RO = typeof globalThis !== 'undefined' ? globalThis.ResizeObserver : undefined;
+  if (typeof RO === 'function') {
+    new RO(() => sizeHitCurrent()).observe(svg);
+  } else if (typeof globalThis !== 'undefined' && typeof globalThis.addEventListener === 'function') {
+    globalThis.addEventListener('resize', sizeHitCurrent);
+  }
 
   const clientToMin = (clientX, clientY) => {
     const pt = svg.createSVGPoint();

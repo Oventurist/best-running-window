@@ -115,8 +115,24 @@ button[type="submit"]:disabled {
 .chart-card svg { width: 100%; height: auto; display: block; }
 .chart-title { font-family: 'Montserrat', sans-serif; font-size: 1.25rem; font-weight: 700; margin: 0 0 16px; }
 
-/* Draggable run-window band */
-.window-band { cursor: grab; touch-action: none; }
+/* Axis ticks carry font-size="11" as a presentation attribute, i.e. in viewBox
+   user units. On a 375px phone the chart scales to ~0.41, so those labels
+   render at ~4.5px — you cannot see the time you are dragging to. CSS wins over
+   presentation attributes, so restate the size in user units for narrow screens
+   (~22 units => ~9px rendered on a phone, ~11px on a small tablet). */
+@media (max-width: 640px) {
+  .chart-card svg text { font-size: 22px; }
+}
+
+/* Draggable run-window band.
+   touch-action is NOT an inherited property. The pointer actually lands on a
+   child element (.band-hit), so declaring it only on the <g> left the hit
+   target at the default `auto` — the browser then claimed the gesture for
+   scrolling and fired pointercancel, killing the drag on touch devices.
+   The descendant selector is what makes the band draggable on a phone. */
+.window-band,
+.window-band * { touch-action: none; }
+.window-band { cursor: grab; }
 .window-band:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 .window-band:focus-visible #band-rect { stroke: #2DD4BF; stroke-width: 1.5; }
 .window-band.is-dragging { cursor: grabbing; }
