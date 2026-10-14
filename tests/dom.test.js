@@ -36,4 +36,24 @@ describe('session-type help popover (real DOM)', () => {
     }
     expect(txt).toContain('Typical: 60–120+ min.'); // long-run duration guidance
   });
+
+  it('run-length live validation toggles submit and the inline hint', () => {
+    const h = document.getElementById('duration-h');
+    const m = document.getElementById('duration-m');
+    const btn = document.querySelector('#form button[type="submit"]');
+    const hint = document.getElementById('duration-hint');
+    expect(btn.disabled).toBe(false);
+    expect(hint.hidden).toBe(true);
+    h.value = '0';
+    m.value = '0';
+    m.dispatchEvent(new global.window.Event('input', { bubbles: true }));
+    expect(btn.disabled).toBe(true);
+    expect(hint.hidden).toBe(false);
+    expect(h.getAttribute('aria-describedby')).toBe('duration-hint');
+    expect(hint.getAttribute('aria-live')).toBe('polite');
+    m.value = '45';
+    m.dispatchEvent(new global.window.Event('input', { bubbles: true }));
+    expect(btn.disabled).toBe(false);
+    expect(hint.hidden).toBe(true);
+  });
 });

@@ -4,6 +4,7 @@ import { computeWBGT } from './wbgt.js';
 import { computeComfortIndex, findBestComfortWindow, SESSION_LABELS } from './comfort.js';
 import { renderResults, updateWindowStats, showError } from './ui.js';
 import { renderTimeline } from './timeline.js';
+import { isValidRunLength, parseRunLengthMinutes } from './run-length.js';
 
 const form = document.getElementById('form');
 const resultsEl = document.getElementById('results');
@@ -13,6 +14,26 @@ const chartEl = document.getElementById('chart');
 let errorEl = document.getElementById('error');
 const dateInput = document.getElementById('date');
 const submitBtn = form.querySelector('button[type="submit"]');
+
+const durationH = document.getElementById('duration-h');
+const durationM = document.getElementById('duration-m');
+const durationHint = document.getElementById('duration-hint');
+let isBusy = false;
+
+// Live run-length check: while the total sits outside 1-600 minutes, disable
+// submit and show the inline hint (same rule as the submit handler).
+function updateRunLengthValidity() {
+  if (!durationH || !durationM || !submitBtn) return;
+  const valid = isValidRunLength(durationH.value, durationM.value);
+  submitBtn.disabled = isBusy || !valid;
+  if (durationHint) durationHint.hidden = valid;
+}
+
+if (durationH && durationM) {
+  durationH.addEventListener('input', updateRunLengthValidity);
+  durationM.addEventListener('input', updateRunLengthValidity);
+  updateRunLengthValidity();
+}
 
 // Open-Meteo's forecast endpoint serves ~16 days ahead; past dates aren't
 // available through it (audit 4.3).
@@ -77,9 +98,7 @@ form.addEventListener('submit', async (e) => {
   resultsEl.hidden = true;
   chartEl.hidden = true;
   const zip = form.zipcode.value.trim();
-  const h = parseInt(form['duration-h'].value, 10) || 0;
-  const m = parseInt(form['duration-m'].value, 10) || 0;
-  const runLengthMin = h * 60 + m;
+  const runLengthMin = parseRunLengthMinutes(form['duration-h'].value, form['duration-m'].value);
   if (!(runLengthMin >= 1 && runLengthMin <= 600)) {
     errorEl = showError(errorEl, 'Enter a run length between 1 minute and 10 hours.');
     return;
@@ -184,7 +203,8 @@ function toISODate(d) {
 // aria-busy, and show a skeleton over the results area while fetching.
 function setBusy(busy) {
   if (!submitBtn) return;
-  submitBtn.disabled = busy;
+  isBusy = busy;
+  updateRunLengthValidity();
   submitBtn.setAttribute('aria-busy', String(busy));
   if (busy) {
     submitBtn.dataset.originalHtml = submitBtn.innerHTML;
